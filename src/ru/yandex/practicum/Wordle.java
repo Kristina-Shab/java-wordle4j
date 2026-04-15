@@ -1,10 +1,7 @@
 package ru.yandex.practicum;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Scanner;
 
 /*
 в главном классе нам нужно:
@@ -15,15 +12,33 @@ import java.nio.file.Paths;
     вызвать игровой метод в котором в цикле опрашивать пользователя и передавать информацию в игру
     вывести состояние игры и конечный результат
  */
-public class Wordle{
+public class Wordle {
 
     public static void main(String[] args) throws IOException {
         WordleDictionaryLoader wordleDictionaryLoader = new WordleDictionaryLoader();
         WordleDictionary dictionary = wordleDictionaryLoader.getDictionary("words_ru.txt");
-        System.out.println(dictionary.getWords());
+        WordleGame game = new WordleGame(dictionary);
+        Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Игра начинается!");
+        while (game.getSteps() > 0) {
+            System.out.println("Введите слово");
+            String word = scanner.nextLine();
+            while (!dictionary.isValidUserWord(word)) {
+                System.out.println("Введите корректное слово");
+                word = scanner.nextLine();
+            }
+            String wordValid = dictionary.formatWord(word);
+            if (game.isWin(wordValid)) {
+                System.out.println("Поздравляем. Вы выйграли.");
+                break;
+            }
+            System.out.println(game.gameStep(wordValid));
+            System.out.println("Осталось попыток: " + game.getSteps());
+        }
+        if (game.getSteps() == 0) {
+            System.out.println("К сожалению вы проиграли. В следующий раз все получится.");
+            System.out.println("Загаданное слово - " + game.getAnswer());
+        }
     }
-
-
-
 }
