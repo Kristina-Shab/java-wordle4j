@@ -24,6 +24,10 @@ public class Wordle {
         while (game.getSteps() > 0) {
             System.out.println("Введите слово");
             String word = scanner.nextLine();
+            if(word.isEmpty()){
+                word = game.getRandomHint();
+                System.out.println(word);
+            }
             while (!dictionary.isValidUserWord(word)) {
                 System.out.println("Введите корректное слово");
                 word = scanner.nextLine();

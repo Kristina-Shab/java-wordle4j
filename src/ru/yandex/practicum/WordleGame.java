@@ -1,7 +1,6 @@
 package ru.yandex.practicum;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /*
 в этом классе хранится словарь и состояние игры
@@ -19,17 +18,23 @@ public class WordleGame {
 
     private final String answer;
     private final WordleDictionary dictionary;
+    private final Map<String, String> stepHistory;
+    private final List<String> hintHystory;
     private int steps;
 
     public WordleGame(WordleDictionary dictionary) {
         answer = getWordforAnswer(dictionary.getWords());
         steps = 6;
         this.dictionary = dictionary;
+        stepHistory = new LinkedHashMap<>();
+        hintHystory = new ArrayList<>(6);
     }
 
     public String gameStep(String userWord) {
         steps--;
-        return dictionary.getHintString(userWord, answer);
+        String hint = dictionary.getHintString(userWord, answer);
+        stepHistory.put(userWord, hint);
+        return hint;
     }
 
     private String getWordforAnswer(List<String> words) {    // + проверка, что список не пустой
@@ -48,5 +53,16 @@ public class WordleGame {
 
     public int getSteps() {
         return steps;
+    }
+
+    public String getRandomHint() {
+        List<String> hints = dictionary.getPossibleWords(stepHistory);
+        for (int i = 0; i < hints.size(); i++) {
+            if (!hintHystory.contains(hints.get(i))) {
+                hintHystory.add(hints.get(i));
+                return hints.get(i);
+            }
+        }
+        throw new RuntimeException();
     }
 }

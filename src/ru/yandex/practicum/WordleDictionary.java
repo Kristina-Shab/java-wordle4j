@@ -1,6 +1,8 @@
 package ru.yandex.practicum;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /*
 этот класс содержит в себе список слов List<String>
@@ -46,5 +48,61 @@ public class WordleDictionary {
 
     public String formatWord(String word) {
         return word.toLowerCase().replace("ё", "е");
+    }
+
+    public List<String> getPossibleWords(Map<String, String> stepHistory){
+        List<String> possibleWords = new ArrayList<>();
+        for (String word:words) {
+            if(matchesAllHints(word, stepHistory)){
+                possibleWords.add(word);
+            }
+        }
+        return possibleWords;
+    }
+
+    private boolean matchesAllHints(String word, Map<String, String> stepHistory){
+        for (Map.Entry<String, String> entry : stepHistory.entrySet()) {
+            String step = entry.getKey();
+            String hint = entry.getValue();
+
+            if (!matchesHint(word, step, hint)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean matchesHint(String word, String step, String hint){
+        for (int i = 0; i < hint.length(); i++) {
+            char stepChar = step.charAt(i);
+            char hintChar = hint.charAt(i);
+
+            if (hintChar == '+') {
+                if (word.charAt(i) != stepChar) {
+                    return false;
+                }
+            }
+            if (hintChar == '^') {
+                if (!isLetterInWord(stepChar, word)) {
+                    return false;
+
+                }
+            }
+            if (hintChar == '-') {
+                if (isLetterInWord(stepChar, word)) {
+                    return false;
+
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean isLetterInWord(char letter, String word){
+        for (int i = 0; i < word.length(); i++) {
+            if (word.charAt(i) == letter) {
+                return true;
+            }
+        }
+        return false;
     }
 }
