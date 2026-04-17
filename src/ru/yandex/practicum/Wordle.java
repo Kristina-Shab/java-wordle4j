@@ -14,11 +14,12 @@ import java.util.Scanner;
  */
 public class Wordle {
 
-    public static void main(String[] args) throws IOException {
-        WordleDictionaryLoader wordleDictionaryLoader = new WordleDictionaryLoader();
-        WordleDictionary dictionary = wordleDictionaryLoader.getDictionary("words_ru.txt");
-        WordleGame game = new WordleGame(dictionary);
-        Scanner scanner = new Scanner(System.in);
+    public static void main(String[] args) {
+        try (LogWriter logWriter = new LogWriter()) {
+            WordleDictionaryLoader wordleDictionaryLoader = new WordleDictionaryLoader();
+            WordleDictionary dictionary = wordleDictionaryLoader.getDictionary("words_ru.txt");
+            WordleGame game = new WordleGame(dictionary);
+            Scanner scanner = new Scanner(System.in);
 
         System.out.println("Игра начинается!");
         while (game.getSteps() > 0) {
