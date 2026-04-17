@@ -1,5 +1,9 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.exception.DictionaryLoadException;
+import ru.yandex.practicum.exception.GameRuntimeException;
+import ru.yandex.practicum.exception.NoHintsException;
+
 import java.util.*;
 
 /*
@@ -30,14 +34,26 @@ public class WordleGame {
         hintHystory = new ArrayList<>(6);
     }
 
-    public String gameStep(String userWord) {
+    public String gameStep(String userWord) throws GameRuntimeException {
+        if (userWord == null) {
+            throw new GameRuntimeException("userWord = null");
+        }
+        if (steps <= 0) {
+            throw new GameRuntimeException("Ходы закончились. Игра не может продолжаться");
+        }
+        if (userWord.length() != answer.length()) {
+            throw new GameRuntimeException("Длины слов правильного ответа и ввода пользователя не совпадают");
+        }
         steps--;
         String hint = dictionary.getHintString(userWord, answer);
         stepHistory.put(userWord, hint);
         return hint;
     }
 
-    private String getWordforAnswer(List<String> words) {    // + проверка, что список не пустой
+    private String getWordforAnswer(List<String> words) {
+        if (words == null || words.isEmpty()) {
+            throw new DictionaryLoadException("Список доступных для игры слов пустой. Невозможно загадать слово");
+        }
         Random random = new Random();
         int index = random.nextInt(words.size());
         return words.get(index);
@@ -55,14 +71,14 @@ public class WordleGame {
         return steps;
     }
 
-    public String getRandomHint() {
+    public String getRandomHint() throws NoHintsException {
         List<String> hints = dictionary.getPossibleWords(stepHistory);
-        for (int i = 0; i < hints.size(); i++) {
-            if (!hintHystory.contains(hints.get(i))) {
-                hintHystory.add(hints.get(i));
-                return hints.get(i);
+        for (String hint : hints) {
+            if (!hintHystory.contains(hint)) {
+                hintHystory.add(hint);
+                return hint;
             }
         }
-        throw new RuntimeException();
+        throw new NoHintsException("Доступных подсказок не осталось");
     }
 }

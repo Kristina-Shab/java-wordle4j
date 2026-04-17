@@ -1,5 +1,7 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.exception.LogFileException;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,12 +11,12 @@ import java.util.Arrays;
 public class LogWriter implements AutoCloseable {
     private final PrintWriter writer;
 
-    public LogWriter() {
+    public LogWriter() throws LogFileException {
         try {
             Writer fileWriter = new FileWriter(createLogFile(), true);
             this.writer = new PrintWriter(fileWriter);
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new LogFileException("Ошибка создания лог-файла");
         }
     }
 
@@ -40,11 +42,22 @@ public class LogWriter implements AutoCloseable {
     }
 
     public void write(String text) {
+        checkLogFile();
         writer.println(text);
     }
 
     public void write(Exception e) {
-        writer.println(e.getMessage() + " " + Arrays.toString(e.getStackTrace()));
+        checkLogFile();
+        writer.println("Поймано исключение:");
+        writer.println(e.getMessage());
+        writer.println(Arrays.toString(e.getStackTrace()));
+    }
+
+    private void checkLogFile() throws LogFileException {
+        Path pathFile = Paths.get("logs", "Logs-File.txt");
+        if (!Files.exists(pathFile)) {
+            throw new LogFileException("Лог-файл не найден или был удален");
+        }
     }
 
     @Override

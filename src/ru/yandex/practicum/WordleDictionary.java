@@ -1,5 +1,8 @@
 package ru.yandex.practicum;
 
+import ru.yandex.practicum.exception.InvalidWordException;
+import ru.yandex.practicum.exception.WordNotFoundInDictionaryException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,32 +38,33 @@ public class WordleDictionary {
         return hint.toString();
     }
 
-    public boolean isValidUserWord(String userWord) {
+    public void checkUserWord(String userWord) throws InvalidWordException, WordNotFoundInDictionaryException {
         if (userWord.isBlank()) {
-            return false;
+            throw new InvalidWordException("Введенное слово состоит из пробелов");
         }
-        userWord = userWord.trim();
         if (userWord.length() != 5) {
-            return false;
+            throw new InvalidWordException("Введено слово не из 5 символов");
         }
-        return words.contains(userWord);
+        if (!words.contains(userWord)) {
+            throw new WordNotFoundInDictionaryException("Введенное слово не найдено в словаре", userWord);
+        }
     }
 
     public String formatWord(String word) {
         return word.toLowerCase().replace("ё", "е");
     }
 
-    public List<String> getPossibleWords(Map<String, String> stepHistory){
+    public List<String> getPossibleWords(Map<String, String> stepHistory) {
         List<String> possibleWords = new ArrayList<>();
-        for (String word:words) {
-            if(matchesAllHints(word, stepHistory)){
+        for (String word : words) {
+            if (matchesAllHints(word, stepHistory)) {
                 possibleWords.add(word);
             }
         }
         return possibleWords;
     }
 
-    private boolean matchesAllHints(String word, Map<String, String> stepHistory){
+    private boolean matchesAllHints(String word, Map<String, String> stepHistory) {
         for (Map.Entry<String, String> entry : stepHistory.entrySet()) {
             String step = entry.getKey();
             String hint = entry.getValue();
@@ -71,7 +75,8 @@ public class WordleDictionary {
         }
         return true;
     }
-    private boolean matchesHint(String word, String step, String hint){
+
+    private boolean matchesHint(String word, String step, String hint) {
         for (int i = 0; i < hint.length(); i++) {
             char stepChar = step.charAt(i);
             char hintChar = hint.charAt(i);
@@ -97,7 +102,7 @@ public class WordleDictionary {
         return true;
     }
 
-    private boolean isLetterInWord(char letter, String word){
+    private boolean isLetterInWord(char letter, String word) {
         for (int i = 0; i < word.length(); i++) {
             if (word.charAt(i) == letter) {
                 return true;
