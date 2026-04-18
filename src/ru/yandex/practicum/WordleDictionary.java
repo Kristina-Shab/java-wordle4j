@@ -13,11 +13,12 @@ import java.util.Map;
     также этот класс может содержать рутинные функции по сравнению слов, букв и т.д.
  */
 public class WordleDictionary {
-
     private final List<String> words;
+    private final LogWriter logWriter;
 
-    public WordleDictionary(List<String> words) {
+    public WordleDictionary(List<String> words, LogWriter logWriter) {
         this.words = words;
+        this.logWriter = logWriter;
     }
 
     public List<String> getWords() {
@@ -39,6 +40,7 @@ public class WordleDictionary {
     }
 
     public void checkUserWord(String userWord) throws InvalidWordException, WordNotFoundInDictionaryException {
+        logWriter.write("Проверка введенного игроком слова на корректность.");
         if (userWord.isBlank()) {
             throw new InvalidWordException("Введенное слово состоит из пробелов");
         }
@@ -61,6 +63,7 @@ public class WordleDictionary {
                 possibleWords.add(word);
             }
         }
+        logWriter.write("Создан список слов, подходящих под все подсказки - " + possibleWords.size() + "слов.");
         return possibleWords;
     }
 

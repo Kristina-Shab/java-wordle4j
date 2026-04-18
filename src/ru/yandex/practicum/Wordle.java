@@ -17,36 +17,40 @@ import java.util.Scanner;
 public class Wordle {
 
     public static void main(String[] args) {
-        try (LogWriter logWriter = new LogWriter()) {
-            WordleDictionaryLoader wordleDictionaryLoader = new WordleDictionaryLoader();
+        try (LogWriter logWriter = new LogWriter(); Scanner scanner = new Scanner(System.in)) {
+            WordleDictionaryLoader wordleDictionaryLoader = new WordleDictionaryLoader(logWriter);
             WordleDictionary dictionary = wordleDictionaryLoader.getDictionary("words_ru.txt");
-            WordleGame game = new WordleGame(dictionary);
-            Scanner scanner = new Scanner(System.in);
+            WordleGame game = new WordleGame(dictionary, logWriter);
 
             System.out.println("Игра начинается! Для выхода нажмите *");
+            logWriter.write("--****--\nНачало игры");
             while (game.getSteps() > 0) {
                 System.out.println("Введите слово");
                 String word = scanner.nextLine();
                 if (word.equals("*")) {
+                    logWriter.write("Игрок вышел из игры.");
                     System.out.println("До свидания! Спасибо за игру.");
                     break;
                 }
                 if (word.isEmpty()) {
-                    word = requestHint(game, scanner);
+                    word = requestHint(game, scanner, logWriter);
                 }
-                String wordValid = checkAndGetWordIfRequired(dictionary, scanner, word);
+                String wordValid = checkAndGetWordIfRequired(dictionary, scanner, word, logWriter);
                 if (wordValid.equals("*")) {
+                    logWriter.write("Игрок вышел из игры.");
                     System.out.println("До свидания! Спасибо за игру.");
                     break;
                 }
                 if (game.isWin(wordValid)) {
-                    System.out.println("Поздравляем. Вы выйграли.");
+                    logWriter.write("Слово угадано. Победа.");
+                    System.out.println("Поздравляем. Вы выиграли.");
                     break;
                 }
                 System.out.println(game.gameStep(wordValid));
                 System.out.println("Осталось попыток: " + game.getSteps());
             }
             if (game.getSteps() == 0) {
+                logWriter.write("Ходов не осталось. Конец игры.");
                 System.out.println("К сожалению вы проиграли. В следующий раз все получится.");
                 System.out.println("Загаданное слово - " + game.getAnswer());
             }
@@ -55,12 +59,13 @@ public class Wordle {
         }
     }
 
-    private static String requestHint(WordleGame game, Scanner scanner) {
+    private static String requestHint(WordleGame game, Scanner scanner, LogWriter logWriter) {
         try {
             String hintWord = game.getRandomHint();
             System.out.println(hintWord);
             return hintWord;
         } catch (NoHintsException e) {
+            logWriter.write(e);
             System.out.println("Не получилось воспользоваться подсказкой, введите слово самостоятельно");
             return scanner.nextLine();
         }
@@ -69,7 +74,8 @@ public class Wordle {
     private static String checkAndGetWordIfRequired(
             WordleDictionary dictionary,
             Scanner scanner,
-            String word
+            String word,
+            LogWriter logWriter
     ) {
         String currentWord = word;
         while (true) {
@@ -78,6 +84,7 @@ public class Wordle {
                 dictionary.checkUserWord(formatWord);
                 return formatWord;
             } catch (GameException e) {
+                logWriter.write(e);
                 System.out.println("Введите корректное слово");
                 currentWord = scanner.nextLine();
                 if (currentWord.equals("*")) {

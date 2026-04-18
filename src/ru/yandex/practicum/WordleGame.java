@@ -24,12 +24,14 @@ public class WordleGame {
     private final WordleDictionary dictionary;
     private final Map<String, String> stepHistory;
     private final List<String> hintHystory;
+    private final LogWriter logWriter;
     private int steps;
 
-    public WordleGame(WordleDictionary dictionary) {
+    public WordleGame(WordleDictionary dictionary, LogWriter logWriter) {
+        this.logWriter = logWriter;
+        this.dictionary = dictionary;
         answer = getWordforAnswer(dictionary.getWords());
         steps = 6;
-        this.dictionary = dictionary;
         stepHistory = new LinkedHashMap<>();
         hintHystory = new ArrayList<>(6);
     }
@@ -46,6 +48,7 @@ public class WordleGame {
         }
         steps--;
         String hint = dictionary.getHintString(userWord, answer);
+        logWriter.write("Игровой ход. Введенное слово " + userWord + ". Строка подсказка " + hint);
         stepHistory.put(userWord, hint);
         return hint;
     }
@@ -56,7 +59,9 @@ public class WordleGame {
         }
         Random random = new Random();
         int index = random.nextInt(words.size());
-        return words.get(index);
+        String answer = words.get(index);
+        logWriter.write("Загадано слово " + answer);
+        return answer;
     }
 
     public boolean isWin(String userWord) {
@@ -72,10 +77,12 @@ public class WordleGame {
     }
 
     public String getRandomHint() throws NoHintsException {
+        logWriter.write("Игрок запросил подсказку подходящего слова");
         List<String> hints = dictionary.getPossibleWords(stepHistory);
         for (String hint : hints) {
             if (!hintHystory.contains(hint)) {
                 hintHystory.add(hint);
+                logWriter.write("Выбрана подсказка " + hint);
                 return hint;
             }
         }

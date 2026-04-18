@@ -15,7 +15,14 @@ import java.util.List;
     на выходе должен быть класс WordleDictionary
  */
 public class WordleDictionaryLoader {
-    public WordleDictionary getDictionary(String nameFile) {
+    private final LogWriter logWriter;
+
+    public WordleDictionaryLoader(LogWriter logWriter) {
+        this.logWriter = logWriter;
+    }
+
+    public WordleDictionary getDictionary(String nameFile) throws DictionaryLoadException {
+        logWriter.write("Началась загрузка словаря.");
         List<String> validWords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(nameFile, StandardCharsets.UTF_8))) {
             while (br.ready()) {
@@ -28,7 +35,8 @@ public class WordleDictionaryLoader {
         } catch (IOException e) {
             throw new DictionaryLoadException("Ошибка чтения файла: " + nameFile);
         }
-        return new WordleDictionary(validWords);
+        logWriter.write("Словарь загружен. Всего " + validWords.size() + "слов.");
+        return new WordleDictionary(validWords, logWriter);
     }
 
     private void addWordsToDictionary(String word, List<String> validWords) {
