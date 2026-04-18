@@ -20,6 +20,10 @@ public class LogWriter implements AutoCloseable {
         }
     }
 
+    public LogWriter(PrintWriter writer) {
+        this.writer = writer;
+    }
+
     private File createLogFile() throws IOException {
         Path pathDir = Paths.get("logs");
         createDirectoryIfNotExists(pathDir);
@@ -44,6 +48,7 @@ public class LogWriter implements AutoCloseable {
     public void write(String text) {
         checkLogFile();
         writer.println(text);
+        writer.flush();
     }
 
     public void write(Exception e) {
@@ -51,6 +56,7 @@ public class LogWriter implements AutoCloseable {
         writer.println("Поймано исключение:");
         writer.println(e.getMessage());
         writer.println(Arrays.toString(e.getStackTrace()));
+        writer.flush();
     }
 
     private void checkLogFile() throws LogFileException {

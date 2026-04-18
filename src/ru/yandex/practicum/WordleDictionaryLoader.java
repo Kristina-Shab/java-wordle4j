@@ -22,7 +22,7 @@ public class WordleDictionaryLoader {
     }
 
     public WordleDictionary getDictionary(String nameFile) throws DictionaryLoadException {
-        logWriter.write("Началась загрузка словаря.");
+        logWriter.write("--******--\nНачалась загрузка словаря.");
         List<String> validWords = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(nameFile, StandardCharsets.UTF_8))) {
             while (br.ready()) {
@@ -35,7 +35,7 @@ public class WordleDictionaryLoader {
         } catch (IOException e) {
             throw new DictionaryLoadException("Ошибка чтения файла: " + nameFile);
         }
-        logWriter.write("Словарь загружен. Всего " + validWords.size() + "слов.");
+        logWriter.write("Словарь загружен. Всего " + validWords.size() + " слов.");
         return new WordleDictionary(validWords, logWriter);
     }
 

@@ -63,7 +63,7 @@ public class WordleDictionary {
                 possibleWords.add(word);
             }
         }
-        logWriter.write("Создан список слов, подходящих под все подсказки - " + possibleWords.size() + "слов.");
+        logWriter.write("Создан список слов, подходящих под все подсказки - " + possibleWords.size() + " слов.");
         return possibleWords;
     }
 

@@ -42,7 +42,7 @@ public class WordleGameTest {
     @Test
     void gameStepDecrementsSteps() {
         int stepsBefore = game.getSteps();
-        game.gameStep(wrongWord);
+        game.makeStep(wrongWord);
         int stepsAfter = game.getSteps();
 
         assertEquals(stepsBefore - 1, stepsAfter);

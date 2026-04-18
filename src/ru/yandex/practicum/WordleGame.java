@@ -23,7 +23,7 @@ public class WordleGame {
     private final String answer;
     private final WordleDictionary dictionary;
     private final Map<String, String> stepHistory;
-    private final List<String> hintHystory;
+    private final List<String> hintHistory;
     private final LogWriter logWriter;
     private int steps;
 
@@ -33,10 +33,10 @@ public class WordleGame {
         answer = getWordforAnswer(dictionary.getWords());
         steps = 6;
         stepHistory = new LinkedHashMap<>();
-        hintHystory = new ArrayList<>(6);
+        hintHistory = new ArrayList<>(6);
     }
 
-    public String gameStep(String userWord) throws GameRuntimeException {
+    public String makeStep(String userWord) throws GameRuntimeException {
         if (userWord == null) {
             throw new GameRuntimeException("userWord = null");
         }
@@ -60,7 +60,7 @@ public class WordleGame {
         Random random = new Random();
         int index = random.nextInt(words.size());
         String answer = words.get(index);
-        logWriter.write("Загадано слово " + answer);
+        logWriter.write("Загадано слово: " + answer);
         return answer;
     }
 
@@ -80,8 +80,8 @@ public class WordleGame {
         logWriter.write("Игрок запросил подсказку подходящего слова");
         List<String> hints = dictionary.getPossibleWords(stepHistory);
         for (String hint : hints) {
-            if (!hintHystory.contains(hint)) {
-                hintHystory.add(hint);
+            if (!hintHistory.contains(hint)) {
+                hintHistory.add(hint);
                 logWriter.write("Выбрана подсказка " + hint);
                 return hint;
             }
